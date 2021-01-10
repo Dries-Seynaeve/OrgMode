@@ -1,0 +1,44 @@
+* GTD related things
+** NEXT Weekly Review ...
+   SCHEDULED: <2021-01-10 Sun>
+
+* Legal obligations
+** NEXT Prepare tax declaration
+   DEADLINE: <2021-01-24 Sun> SCHEDULED: <2021-01-11 Mon>
+   - Collect all documents for your tax lawyer
+** TODO Call the tax lawyer afterh teh documents were sent
+
+* Maintenance
+** NEXT Wash the car
+   SCHEDULED: <2021-01-14 Thu>
+** PROJECT Repair bicycle
+*** WAITING Delivery of spare parts
+    SCHEDULED: <2021-01-23 Sat>
+    I have the chain ordered, needs to be delivered
+*** TODO Mount chain
+    You probably need to re adjust the gear shifting
+
+
+* Family business
+** NEXT Get a birthday gift for wife
+   SCHEDULED: <2021-01-11 Mon>
+** NEXT Watch concert of your kid in school
+   SCHEDULED: <2021-01-17 Sun 16:00-17:00>
+   - Don't miss that, otherwise kid is disapointed
+
+* House stuff
+** TODO Build a bike port in the garden
+
+
+
+
+* Notes
+#######-NOTES-#######
+To schedule when you want to start working on a task should be done:
+Ctrl + C , Ctrl + S
+
+To include a deadline:
+Ctrl + C , Ctrl + D
+
+To look up what you should do today, you can use agendaview.
+Ctrl + A

@@ -1,0 +1,34 @@
+* GTD related things
+** NEXT Weekly Review
+
+
+* Legal obligations
+** NEXT Prepare tax declaration
+   - Collect all documents for your tax lawyer
+** TODO Call the tax lawer after the documents are send
+
+* Maintenance
+** NEXT Wash the car
+   - Washing from ouside and vucuum cleaning the table
+** PROJECT Repair bicycle
+*** WAITING Delivery of spare part (chain)
+    I have the chain ordered, needs to be deliverd
+*** TODO Mount chain
+    You probably need to re adjust the gear shifting
+
+* Family business
+** NEXT Get a birthday gift for wife
+** NEXT Watch concert of your kid in school
+   - Don't miss that, otherwise kid is disappointed
+
+* House stuff
+** WAITING Build a bike port in the garden
+   Budget is £200 for the whole thing
+
+
+#######-NOTES-#######
+Cycle through possible tatus of a task:
+Shift + -> or Shift + <-
+
+Get menu of all keywords
+Ctrl + C , Ctrl + T
