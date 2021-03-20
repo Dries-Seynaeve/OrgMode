@@ -1,0 +1,27 @@
+* This is a orgfile that will help with understanding how magit works. 
+
+The magit command is trigered by typing: 'C-x g'
+
+After having invoked this command, I obtain a buffer with on top of the buffer the discription of the head and origin/main branch. 
+Under this there is a subtitle with the untracked files, and under there a subtitle with Recent commits. These alineas can be exapanded
+or collapsed by invoking the TAB comand on the subtitles. 
+
+A difference between Git GUIs and Magis is that Magis is mainly controled by using the keyboard instead of the mouse. This difference is 
+imedialty obvious, but the difference between the two go much further then that. 
+==> Magit is a combines the completness of Git with the interactive nature of a GUI.
+
+** What seprarates Magit from other Git interfaces? 
+Magit relies on a few simple, yet powerful interface concepts. What makes these applications powerfull is that these concepts are applied 
+very consistently. 
+*** All ouput is actionable
+Magit is similar to Git => (pretier) text based interface. 
+Magit is similar to GUI => Magit's output is not 'Read Only'. Everything that can be seen is actionable.
+Unlike in GUI interface => Every action you might want/can perform is available using only a few mnemonic key presses. 
+
+*** It is complete
+Magis is a complete Git ineterface. Not only does it support most Git features, they are mostly imporved upon. 
+=> About 90% complete ~support for not included features can be added. 
+
+*** Grows with you
+Magic offers specialzed variants of common commands, that could optimize workflow. => Encourages users to learn more complex concepts, but doesn't forces it. 
+The interface does not become more complex after having become a proficient Git user, while still remaining complete/sufficient. 

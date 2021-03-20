@@ -1,0 +1,2 @@
+* The Status buffer: 'C-x g'
+This command is similar to 'git status' in the shell. 

@@ -1,0 +1,5 @@
+* The Status buffer: 'C-x g'
+This command is similar to 'git status' in the shell. 
+
+* Almost anything you see in the magit buffer can be acted on, by general commands. 
+=> TAB and RET key. 
