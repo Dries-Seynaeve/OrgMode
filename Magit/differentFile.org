@@ -25,6 +25,23 @@ Magit/differentFile.org~
 5819655 My first notes on starting to work with emacs Org-Mode
 6fac902 Update README.md
 ** Track the new file
+Go with the cursor over the line of the untracked file. *Stage* the file using "s". What we now see 
+is:
+*** Magit buffer
+**** Unstaged changes (1)
+    modified     Magit/MagitWorking.org
+
+**** Staged changes (2)
+     new file    Magit/differentFile.org
+     new file    Magit/differentfile.org~
+
+**** Recent commits
+4c8a00d main origin/main The is a test to use Magit, to push a change to a already added file.
+5b85261 Added new files that discuss how magit works inside emcas.
+5819655 My first notes on starting to work with emacs Org-Mode
+6fac902 Update README.md
+
+*** 
 I have now saved a cheat-sheet with pdf command on Magit in this location. To *add* a file the file to git, 
 one can use the "C-u s" command. The Magit buffer now shows: 
 *** Magit buffer
@@ -43,3 +60,21 @@ one can use the "C-u s" command. The Magit buffer now shows:
 5b85261 Added new files that discuss how magit works inside emcas.
 5819655 My first notes on starting to work with emacs Org-Mode
 6fac902 Update README.md
+** Stage changes
+*** Stage a whole file.
+As seen before, we can simply stage a change by going to the file in the Magit buffer and pressing "s". 
+To only stage certain changes to the file, by pressing "TAB" key on an unstaged changes file. For this excerise
+we do this for this file. We now see the **Track the new file** section of this file. Let us change also a bit 
+of this files heading. 
+*** Stage a block
+Now that this is done, I will refresh magit by pressing "g" in the Magit buffer. We can now see that changes that 
+can be staged by magit. Interestingly the file consitst of two blocks of stages the can be pushed. To push the 
+upper block by pressing  "s" inside this block. 
+*** Stage a part of code
+Go over to the Unstaged changes file and show the unstaged changes by pressing "TAB". Highlight the block of text 
+from ... I hve now saved a cheat-sheet with pdf command ... ... **Stage changes. Stage this block of text by pressing
+"s". Now this block of text is staged as well. 
+** Committing files
+Let us go to the Staged changes files, and commit these fils by pressing "c". 
+** Merging files
+We can then go to Unmerged into origin/main files and merge these using m.
