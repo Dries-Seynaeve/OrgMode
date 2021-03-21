@@ -1,0 +1,45 @@
+'This is a different file that continues from MagitWorking.org. The goal of this file is to give a nice overview of 
+a workflow using Magit. A very nice way to use git in emacs. 
+
+
+* Different File
+
+This is a different File that I want to add to my github repo.
+
+* WorkFlow
+** Save The File
+** Open Magit: 
+"C-x g"
+This is what we see in the magit buffer:
+*** Magit buffer
+**** Untracked files (2)
+Magit/differentFile.org
+Magit/differentFile.org~
+
+**** Unstaged changes (1)
+    modified     Magit/MagitWorking.org
+
+**** Recent comits
+4c8a00d main origin/main The is a test to use Magit, to push a change to a already added file.
+5b85261 Added new files that discuss how magit works inside emcas.
+5819655 My first notes on starting to work with emacs Org-Mode
+6fac902 Update README.md
+** Track the new file
+I have now saved a cheat-sheet with pdf command on Magit in this location. To *add* a file the file to git, 
+one can use the "C-u s" command. The Magit buffer now shows: 
+*** Magit buffer
+**** Unstage changes (3)
+    modified     Magit/MagitWorking.org
+    modified     Magit/differentFile.org
+    modified     Magit/magit-refcard.pdf
+
+**** Staged changes (3)
+     new file    Magit/differentFile.org
+     new file    Magit/differentfile.org~
+     new file    Magit/magit-refcard.pdf
+
+**** Recent commits
+4c8a00d main origin/main The is a test to use Magit, to push a change to a already added file.
+5b85261 Added new files that discuss how magit works inside emcas.
+5819655 My first notes on starting to work with emacs Org-Mode
+6fac902 Update README.md
