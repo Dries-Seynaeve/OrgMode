@@ -76,5 +76,5 @@ from ... I hve now saved a cheat-sheet with pdf command ... ... **Stage changes.
 "s". Now this block of text is staged as well. 
 ** Committing files
 Let us go to the Staged changes files, and commit these fils by pressing "c". 
-** Merging files
-We can then go to Unmerged into origin/main files and merge these using m.
+** Pushing files
+We can then push these commits using "P". 
