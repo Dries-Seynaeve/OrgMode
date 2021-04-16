@@ -6,7 +6,18 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (global-set-key (kbd "<f5>") 'revert-buffer)
 #+END_SRC
+* COMMENT LineNumbers
+#+BEGIN_SRC emacs-lisp
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
 
+  ;;Disable line numbers for some nodes
+  (dolist (mode '(org-mode-hook
+		  term-mode-hook
+		  eshell-mode-hook
+		  vterm-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+#+END_SRC
 #+RESULTS:
 : revert-buffer
 
@@ -27,7 +38,8 @@
 * Moe-Dark theme
 Loads the theme
 #+BEGIN_SRC emacs-lisp
-(load-theme 'moe-dark t)
+  (use-package doom-themes)
+  (load-theme 'moe-dark t)
 #+END_SRC
 
 #+RESULTS:
@@ -72,33 +84,39 @@ Loads the theme
 
 * Swiper / Ivy / Counsel 
 #+BEGIN_SRC emacs-lisp
-;; We need to to have counsil in order to for swiper to work
-(use-package counsel
-  :ensure t)
+      ;; We need to to have counsil in order to for swiper to work
+      (use-package counsel
+	:ensure t
+	:bind (:map minibuffer-local-map
+		("C-r" . 'counsel-minibuffer-history)))
 
-(use-package swiper
-  :ensure try
-  :config
-  (progn
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t)
-    (global-set-key "\C-s" 'swiper)
-    (global-set-key (kbd "C-c C-r") 'ivy-resume)
-    (global-set-key (kbd "<f6>") 'ivy-resume)
-    (global-set-key (kbd "M-x") 'counsel-M-x)
-    (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-    (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-    (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-    (global-set-key (kbd "<f1> l") 'counsel-load-library)
-    (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-    (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-    (global-set-key (kbd "C-c g") 'counsel-git)
-    (global-set-key (kbd "C-c j") 'counsel-git-grep)
-    (global-set-key (kbd "C-c k") 'counsel-ag)
-    (global-set-key (kbd "C-x l") 'counsel-locate)
-    (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-    (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-    ))
+      (use-package swiper
+	:ensure try
+	:config
+	(progn
+	  (ivy-mode 1)
+	  (setq ivy-use-virtual-buffers t)
+	  (global-set-key "\C-s" 'swiper)
+	  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+	  (global-set-key (kbd "<f6>") 'ivy-resume)
+	  (global-set-key (kbd "C-x b") 'counsel-ibuffer)
+	  (global-set-key (kbd "M-x") 'counsel-M-x)
+	  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+	  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+	  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+	  (global-set-key (kbd "<f1> l") 'counsel-load-library)
+	  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+	  (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+	  (global-set-key (kbd "C-c k") 'counsel-ag)
+	  (global-set-key (kbd "C-x l") 'counsel-locate)
+	  (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+	  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+	  ))
+
+    ;; Ivy Rich
+  (use-package ivy-rich
+    :init
+     (ivy-rich-mode 1))
 #+END_SRC
 
 * Avy - navigate by searching for a letter on the screen and jump to it
@@ -177,3 +195,18 @@ Loads the theme
 #+end_src
 
 #+RESULTS:
+
+* Doom mode line
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode 1)
+    :custom (doom-modeline-height 15))
+#+end_src
+
+* Rainbow delimiters
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
