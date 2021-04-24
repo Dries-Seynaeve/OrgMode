@@ -1,0 +1,69 @@
+* First Heading
+
+* ALT-enter: create new heading below the pracecing level (with content)
+  
+  Here is some content!
+
+  
+
+** Sub-Heading
+
+   Add some more content!
+
+* C-enter: creates new heading (without content)
+* Second heading
+* Create a link to a webpage
+    Here is the [[https://orgmode.org][Org Mode homepage]]. This link is open from emacs using the comand (C-c C-o).
+* Insert Tables
+  | Name      | Age | Uses Emacs             |
+  | Dries     |  28 | YES                    |
+  | David     |  37 | YES                    |
+  | Alexander |  49 | NO                     |
+  | Lientje   |  26 | NO (she should though) |
+
+* Bulleteted List
+** Simple implementation with -  
+  - First item
+  - Second item
+  - Second item
+  - are created with (ALT-Enter)
+
+** should work with numbers too
+   1. first
+   2. second
+   3. third
+
+** Checklist
+   - [ ] First item
+   - [ ] To get a checkbox in next line: (Shift - Alt - Enter)
+   - [X] Second item
+   - [ ] Third item
+   - [X] We can check items from a list by simply putting X withing the brackets
+   - [X] Or we can run: org-toggle-checkbox command or (C-c C-x C-b)
+
+* Blocks of source blocks
+#+begin_src python
+  var1 = 1
+  var2 = 49
+
+  add = lambda x : x + var2
+
+  print(add(9))
+  print(add(var1))
+#+end_src
+
+
+#+begin_src emacs-lisp
+  (defun mu-elisp-func ()
+    (message "Hello!"))
+#+end_src
+
+* TO-LIST
+It is possible to create TODO list in org-mode, by simply going to any heading and typing TODO
+** TODO This is a first task I need to do!
+** DONE This is a second task I still need to do!
+** I can change the TODO state of my second task after is was done by typing (C-c C-t)
+** We can also togle through the TODO states by pressing (Shift + right)   
+
+   
+    
