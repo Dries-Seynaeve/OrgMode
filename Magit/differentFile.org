@@ -75,6 +75,6 @@ Go over to the Unstaged changes file and show the unstaged changes by pressing "
 from ... I hve now saved a cheat-sheet with pdf command ... ... **Stage changes. Stage this block of text by pressing
 "s". Now this block of text is staged as well. 
 ** Committing files
-Let us go to the Staged changes files, and commit these fils by pressing "c". 
+Let us go to the Staged changes files, and commit these fils by pressing "c". Enter a comment and end the commend with "C-c C-c".
 ** Pushing files
 We can then push these commits using "P". 
