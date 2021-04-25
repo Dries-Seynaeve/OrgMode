@@ -1,12 +1,31 @@
-#+STARTIP: overview
+
+
 * interface tweaks
 #+BEGIN_SRC emacs-lisp
-(setq inhitbit-startup-message t)
-(tool-bar-mode -1)
-(fset 'yes-or-no-p 'y-or-n-p)
-(global-set-key (kbd "<f5>") 'revert-buffer)
+  (setq inhitbit-startup-message t)
+  (tool-bar-mode -1)
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (global-set-key (kbd "<f5>") 'revert-buffer)
+
+  ;; Set up the visible bel
+  (setq visible-bell t)
+
+  ;; Font Configuration ----------------------------------------------------------
+  ;;(use-package fira-code-mode
+  ;;  :custom (fira-code-mode-disabled-ligatures '("[]" "x"))  ; ligatures you don't want
+  ;;  :hook prog-mode)     
+
+
+  (set-face-attribute 'default nil :font "Fira Code Retina" :height 140)
+
+  ;; Set the fixed pitch face
+  (set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 120)
+
+  ;; Set the variable pitch face
+  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)
 #+END_SRC
-* COMMENT LineNumbers
+
+* LineNumbers
 #+BEGIN_SRC emacs-lisp
   (column-number-mode)
   (global-display-line-numbers-mode t)
@@ -17,6 +36,7 @@
 		  eshell-mode-hook
 		  vterm-mode-hook))
     (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
 #+END_SRC
 #+RESULTS:
 : revert-buffer
@@ -35,11 +55,11 @@
      :config
      (which-key-mode))
   #+END_SRC
-* Moe-Dark theme
+* Load theme
 Loads the theme
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes)
-  (load-theme 'moe-dark t)
+  (load-theme 'doom-palenight t)
 #+END_SRC
 
 #+RESULTS:
@@ -47,10 +67,62 @@ Loads the theme
 
 * Org mode settings
 #+BEGIN_SRC emacs-lisp
-(use-package org-bullets
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+    (defun efs/org-mode-setup ()
+      (org-indent-mode)
+      (variable-pitch-mode 1)
+      (auto-fill-mode 0)
+      (visual-line-mode 1)
+      (setq evil-auto-indent nil))
+
+
+    (use-package org
+      :hook (org-mode . efs/org-mode-setup)
+      :config
+      (setq org-ellipsis " ▾"
+	    org-hide-emphasis-markers t))
+
+    (use-package org-bullets
+      :after org
+      :hook (org-mode . org-bullets-mode)
+      :custom
+      (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+    ;; Replace list hyphen with dot
+
+      (font-lock-add-keywords 'org-mode
+			      '(("^ *\\([-]\\) "
+				 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+    ;; Set face for heading levels
+
+      (dolist (face '((org-level-1 . 1.2)
+		      (org-level-2 . 1.1)
+		      (org-level-3 . 1.05)
+		      (org-level-4 . 1.0)
+		      (org-level-5 . 1.1)
+		      (org-level-6 . 1.1)
+		      (org-level-7 . 1.1)
+		      (org-level-8 . 1.1)))
+	(set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
+
+
+      ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+      (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+      (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+  ;; To center text on screen and have a text width of 100 caracters
+    (defun efs/org-mode-visual-fill ()
+      (setq visual-fill-column-width 100
+	    visual-fill-column-center-text t)
+      (visual-fill-column-mode 1))
+
+    (use-package visual-fill-column
+      :hook (org-mode . efs/org-mode-visual-fill))
 #+END_SRC
 
 * ibuffer
@@ -77,9 +149,10 @@ Loads the theme
 
 * Terminal settings
 #+BEGIN_SRC emacs-lisp
-;; Use vterm
-(use-package vterm
-  :ensure t)
+  ;; Use vterm
+  (use-package vterm
+    :ensure t)
+  (global-set-key (kbd "<f8>") 'vterm)
 #+END_SRC
 
 * Swiper / Ivy / Counsel 
@@ -178,8 +251,7 @@ Loads the theme
 #+RESULTS: 
 * C++ Integragtion
 #+begin_src emacs-lisp
-  (use-package modern-cpp-font-lock
-    :ensure t)
+
 #+end_src
 
 #+RESULTS:
@@ -192,6 +264,8 @@ Loads the theme
     :init
     (progn
       (bind-key "C-x g" 'magit-status)))
+
+
 #+end_src
 
 #+RESULTS:
@@ -209,4 +283,28 @@ Loads the theme
   (use-package rainbow-delimiters
     :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
+* projectile
+#+begin_src emacs-lisp
+  (use-package projectile
+    :diminish projectile-mode
+    :config (projectile-mode)
+    :custom ((projectile-completion-system 'ivy))
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    (when (file-directory-p "~/Documents/Code")
+      (setq projectile-project-search-path '("~/Documents/Code")))
+    (setq projectile-switch-project-action #'projectile-dired))
 
+  (use-package counsel-projectile
+    :config (counsel-projectile-mode))
+#+end_src
+* Unde Tree
+ #+begin_src emacs-lisp
+   (use-package undo-tree
+     :ensure t
+     :init
+     (global-undo-tree-mode))
+ #+end_src
+
+ #+RESULTS:
