@@ -19,7 +19,11 @@
   | Alexander |  49 | NO                     |
   | Arien     |  26 | NO (she should though) |
 
-* Bulleteted List
+
+
+
+
+* Bulleted List
 ** Simple implementation with -  
   - First item
   - Second item
@@ -62,7 +66,7 @@ It is possible to create TODO list in org-mode, by simply going to any heading a
 ** TODO This is a first task I need to do!
 ** DONE This is a second task I still need to do!
 ** I can change the TODO state of my second task after is was done by typing (C-c C-t)
-** We can also togle through the TODO states by pressing (Shift + right)   
+** We can also toggle through the TODO states by pressing (Shift + right)   
 *** This is a new sub sub branch
 **** With a new sub sub sub branch
 ***** With another new sub sub sub sub branch     
