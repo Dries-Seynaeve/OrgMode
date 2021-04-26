@@ -1,0 +1,34 @@
+* Let this be a file full of tasks that I want to do:
+* Active
+** Eat
+** TODO Sleep
+* Backlog
+* Agenda:
+** Acces the Agende from org mode
+Run
+#+begin_src
+M-x org-agenda
+#+end_src
+ and press
+ #+begin_src
+a
+#+end_src
+to find the agenda. For now this is empty, since we have not planned a date for the tasks.
+** Schedule tasks and deadlines
+In order to schedule a task:
+#+begin_src 
+M-x org-schedule (C-c C-s)
+#+end_src
+In order move through the agenda to schedule a task
+#+begin_src
+Shift + ArrowKeys
+#+end_src
+Similarly it is possible to schedule a deadline by running
+#+begin_src
+M-x org-deadline (C-c C-d)
+#+end_src
+In order to check the list directly, we can run:
+#+begin_src
+M-x org-agend-list
+#+end_src
+
