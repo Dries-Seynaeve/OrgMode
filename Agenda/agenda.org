@@ -31,4 +31,44 @@ In order to check the list directly, we can run:
 #+begin_src
 M-x org-agend-list
 #+end_src
+* To lists
+We can add tags to certain tasks, in order to filter them.
+** TODO Task one                                             :project2:work:
+** TODO Task two                                             :work:project1:
+** TODO Task for work                                                 :work:
+** TODO Task not for work                                             :home:
+** DONE Project that should be done first
+CLOSED: [2021-05-02 Sun 11:24]
+:LOGBOOK:
+- State "DONE"       from "NEXT"       [2021-05-02 Sun 11:24]
+:END:
+** NEXT Project that should follow that last one     :home:project1:@errand:
+
+When we are with our coursor on a task, we can type
+#+begin_src
+M-x counsel-org-tags
+#+end_src
+We can then list all the tasks with a certain tag:
+#+begin_src
+M-x org-agenda
+m
+(tag_name)
+#+end_src
+We can tag a list by simply using the command:
+#+begin_src
+C-c C-q
+#+end_src
+** Item 1                                          :@errand:agenda:planning:
+** Item 2                                             :@home:idea:recurring:
+** Item 3                                     :agenda:planning:new:features:
+** Item 4                                 :@work:planning:bugs:new:features:
+** Item 5                                                            :@home:
+* The file archive.org
+Once a task is done, we don't want it to clutter up our environment. With that in mind, we create the file archive.org. We can archive a task by running
+#+begin_src
+org-refile (C-c C-w)
+#+end_src
+** NEXT Task c
+* Capture Templates
+Alles you to quickly add a task, without leaving your workflow
 

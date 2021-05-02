@@ -1,0 +1,7 @@
+* Inbox
+
+** TODO I hope that this task will now appear in my file.
+  [2021-05-02 Sun 12:43]
+  [[file:~/.emacs.d/myinit.org::*whick key][whick key]]
+
+* 
