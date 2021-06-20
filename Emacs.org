@@ -41,34 +41,55 @@
 * Basic UI Configuration
 
 #+begin_src emacs-lisp
+  
+  (toggle-frame-maximized)
+  (setq inhibit-startup-message t)
+  
+  (scroll-bar-mode -1)     ; Disable visible scrollbar
+  (tool-bar-mode -1)       ; Disabel the toolbar
+  (tooltip-mode -1)        ; Disabel tooltips
+  (set-fringe-mode 10)     ; Give some breathing room
+  
+  (menu-bar-mode -1)    ; Disable the menu bar
+  (fset 'yes-or-no-p 'y-or-n-p)
+  
+  ;; Set up the visible bell
+  (setq visible-bell t)
+  
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+  
+  ;; Disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook
+                  vterm-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+  
+  ;; Set the directory for backup files
+  (setq backup-directory-alist
+        '(("." . "~/.emacs.d/file-backups")))
+  
+  ;; Highlight line mode
+  (global-hl-line-mode t)
 
-     (setq inhibit-startup-message t)
+  ;; Beacon mode
+  (use-package beacon
+    :ensure t
+    :config
+    (beacon-mode 1))
 
-     (scroll-bar-mode -1)     ; Disable visible scrollbar
-     (tool-bar-mode -1)       ; Disabel the toolbar
-     (tooltip-mode -1)        ; Disabel tooltips
-     (set-fringe-mode 10)     ; Give some breathing room
-
-     (menu-bar-mode -1)    ; Disable the menu bar
-     (fset 'yes-or-no-p 'y-or-n-p)
-
-     ;; Set up the visible bell
-     (setq visible-bell t)
-
-     (column-number-mode)
-     (global-display-line-numbers-mode t)
-
-     ;; Disable line numbers for some modes
-     (dolist (mode '(org-mode-hook
-                     term-mode-hook
-                     shell-mode-hook
-                     eshell-mode-hook
-                     vterm-mode-hook))
-       (add-hook mode (lambda () (display-line-numbers-mode 0))))
-
+  ;; Expand region
+  (use-package expand-region
+    :ensure t
+    :config
+    (global-set-key (kbd "C-=") 'er/expand-region))
+  
 #+end_src
 
 #+RESULTS:
+: t
 
 
 ** Font configuration
@@ -88,8 +109,19 @@
 
 
 
+
+
 * UI Configuration
 
+** WhiteSpace
+#+begin_src emacs-lisp
+  
+  (global-set-key (kbd "C-x w") 'whitespace-mode)
+  
+#+end_src
+
+#+RESULTS:
+: whitespace-mode
 ** Color Theme
 
 #+begin_src emacs-lisp
@@ -122,6 +154,8 @@
 	       :ensure t)
 
 #+end_src
+
+#+RESULTS:
    
 ** Which Key
 
@@ -205,6 +239,9 @@
 
 #+end_src
 
+#+RESULTS:
+: list-buffers
+
 ** Ace Window
 #+begin_src emacs-lisp
 
@@ -221,6 +258,10 @@
   (setq aw-keys '(?a ?s ?w ?d ?e ?k ?l ?i ?o))
 
 #+end_src
+
+#+RESULTS:
+| 97 | 115 | 119 | 100 | 101 | 107 | 108 | 105 | 111 |
+
 ** Avy
 #+begin_src emacs-lisp
 
@@ -230,6 +271,10 @@
     :bind ("M-:" . avy-goto-char))
 
 #+end_src
+
+#+RESULTS:
+: avy-goto-char
+
 ** Auto-Complete
 #+begin_src emacs-lisp
   
@@ -254,6 +299,8 @@
 
 #+end_src
 
+#+RESULTS:
+
 ** Company
 #+begin_src emacs-lisp
   
@@ -277,7 +324,7 @@
 
 #+begin_src emacs-lisp
 
-  (defun efs/org-font-setup ()
+  (defun config/org-font-setup ()
     ;; Replace list hyphen with dot
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
@@ -307,19 +354,19 @@
 #+end_src
 
 #+RESULTS:
-: efs/org-font-setup
+: config/org-font-setup
 
 ** Basic Config
 
 #+begin_src emacs-lisp
 
-    (defun efs/org-mode-setup()
+    (defun config/org-mode-setup()
       (org-indent-mode)
       (variable-pitch-mode 1)
       (visual-line-mode 1))
 
     (use-package org
-      :hook (org-mode . efs/org-mode-setup)
+      :hook (org-mode . config/org-mode-setup)
       :config
       (setq org-ellipsis " ▾"
             org-hide-emphasis-markers t))
@@ -329,8 +376,7 @@
     (setq org-log-into-drawer t)
 
     (setq org-agenda-files
-          '("~/.emacs.d/Agenda/tasks.org"
-            "~/.emacs.d/Agenda/birthdays.org"))
+          '("~/.emacs.d/Agenda"))
 
     (require 'org-habit)
     (add-to-list 'org-modules 'org-habit)
@@ -363,34 +409,48 @@
             ("bugs" . ?b)
             ("new features" . ?f)))
 
-    (setq org-capture-templates
-          '(("t" "Tasks / Projects")
-             ("tt" "Task" entry (file+olp "~/.emacs.d/Agenda/tasks.org" "Inbox")
-               "* TODO %?\n  %T\n  %a\n  %i" :empty-lines 1)
 
-            ("j" "Journal Entries")
-            ("jj" "Journal" entry
-             (file+olp+datetree "~/Documents/Code/OrgMode/Agenda/Journal.org")
-             "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-             ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
-             :clock-in :clock-resume
-             :empty-lines 1)
-            ("jm" "Meeting" entry
-             (file+olp+datetree "~/Documents/Code/OrgMode/Agenda/Journal.org")
-             "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-             :clock-in :clock-resume
-             :empty-lines 1)
+#+end_src
 
-            ("w" "Workflows")
-            ("we" "Checking Email" entry (file+olp+datetree "~/Documents/Code/OrgMode/Agenda/Journal.org")
-             "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+#+RESULTS:
+: ((:startgroup) (:endgroup) (@errand . 70) (@home . 72) (@work . 87) (agenda . 97) (planning . 112) (idea . 105) (recurring . 114) (bugs . 98) (new features . 102))
+** Org Capture
 
-            ("m" "Metrics Capture")
-            ("mw" "Weight" table-line (file+headline "~/Documents/Code/OrgMode/Agenda/Metrics.org" "Weight")
-             "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+#+begin_src emacs-lisp
 
-    (define-key global-map (kbd "C-c j")
-      (lambda () (interactive) (org-capture nil "jj")))
+  (setq org-capture-templates
+    `(("t" "Tasks / Projects")
+      ("tt" "Task" entry (file+olp "~/.emacs.d/Agenda/tasks.org" "Inbox")
+       "* TODO %?\nSCHEDULED: %t\n  %a" :empty-lines 1)
+
+      ("tm" "Meeting" entry (file+olp "~/.emacs.d/Agenda/tasks.org" "Meetings")
+       "* MEETING with %? :MEETING:\n %T")
+
+      ("ts" "Seminar" entry (file+olp "~/.emacs.d/Agenda/tasks.org" "Seminar")
+       "* SEMINAR on %T")
+
+      ("j" "Journal Entries")
+      ("jj" "Journal" entry
+           (file+olp+datetree "~/.emacs.d/Agenda/Journal.org")
+           "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+           :clock-in :clock-resume
+           :empty-lines 1)
+      ("jm" "Today todo" entry
+           (file+olp+datetree "~/.emacs.d/Agenda/Journal.org")
+           "* TODO: %? - :today:\n\n"
+           :clock-in :clock-resume
+           :empty-lines 1)
+
+      ("w" "Workflows")
+      ("we" "Checking Email" entry (file+olp+datetree "~/Documents/Code/OrgMode/Agenda/Journal.org")
+           "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+
+      ("m" "Metrics Capture")
+      ("mw" "Weight" table-line (file+headline "~/.emacs.d/Agenda/Metrics.org" "Weight")
+       "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+
+  (define-key global-map (kbd "C-c j")
+    (lambda () (interactive) (org-capture nil "jj")))
 #+end_src
 
 #+RESULTS:
@@ -438,25 +498,25 @@
 #+end_src
 
 #+RESULTS:
-| org-bullets-mode | efs/org-mode-setup | (lambda nil (display-line-numbers-mode 0)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+| org-bullets-mode | config/org-mode-setup | er/add-org-mode-expansions | (lambda nil (display-line-numbers-mode 0)) | (lambda nil (add-hook (quote after-save-hook) (quote config/org-babel-tangle-config))) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-block-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
 
 ** Center Org Buffers
 
 #+begin_src emacs-lisp
 
   ;; To center text on screen and have a text width of 100 caracters
-  (defun efs/org-mode-visual-fill ()
+  (defun config/org-mode-visual-fill ()
     (setq visual-fill-column-width 100
           visual-fill-column-center-text t)
     (visual-fill-column-mode 1))
 
   (use-package visual-fill-column
-    :hook (org-mode . efs/org-mode-visual-fill))
+    :hook (org-mode . config/org-mode-visual-fill))
 
 #+end_src
 
 #+RESULTS:
-| efs/org-mode-visual-fill | org-bullets-mode | efs/org-mode-setup | (lambda nil (display-line-numbers-mode 0)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+| config/org-mode-visual-fill | org-bullets-mode | config/org-mode-setup | er/add-org-mode-expansions | (lambda nil (display-line-numbers-mode 0)) | (lambda nil (add-hook (quote after-save-hook) (quote config/org-babel-tangle-config))) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-block-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
 
 ** Configure Babel Languages
 
@@ -470,7 +530,7 @@
   (push '("conf-unix" . conf-unix) org-src-lang-modes)
 
   ;; Structure Templates
-  (require 'org-tempo)
+;;  (require 'org-tempo)
 
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
@@ -479,22 +539,43 @@
 #+end_src
 
 #+RESULTS:
-: ((py . src python) (el . src emacs-lisp) (sh . src shell) (a . export ascii) (c . center) (C . comment) (e . example) (E . export) (h . export html) (l . export latex) (q . quote) (s . src) (v . verse))
+#+begin_example
+((py . src python) (el . src emacs-lisp) (sh . src shell) (s #+BEGIN_SRC ?
+
+,#+END_SRC) (e #+BEGIN_EXAMPLE
+?
+,#+END_EXAMPLE) (q #+BEGIN_QUOTE
+?
+,#+END_QUOTE) (v #+BEGIN_VERSE
+?
+,#+END_VERSE) (V #+BEGIN_VERBATIM
+?
+,#+END_VERBATIM) (c #+BEGIN_CENTER
+?
+,#+END_CENTER) (C #+BEGIN_COMMENT
+?
+,#+END_COMMENT) (l #+BEGIN_EXPORT latex
+?
+,#+END_EXPORT) (L #+LaTeX: ) (h #+BEGIN_EXPORT html
+?
+,#+END_EXPORT) (H #+HTML: ) (a #+BEGIN_EXPORT ascii
+?
+,#+END_EXPORT) (A #+ASCII: ) (i #+INDEX: ?) (I #+INCLUDE: %file ?))
+#+end_example
 
 ** Auto-tangle Configuration Files
 
 #+begin_src emacs-lisp
-
   ;; Automatically tangle our Emacs.org config file when save it
-  (defun efs/org-babel-tangle-config ()
+  (defun config/org-babel-tangle-config ()
     (when (string-equal (buffer-file-name)
-                        (expand-file-name "/home/k13353/.emacs.d/Emacs.org"))
+                        (expand-file-name "~/.emacs.d/Emacs.org"))
       ;; Dynamic scoping to the rescue
       (let ((org-confirm-babel-evaluate nil))
         (org-babel-tangle))))
 
-  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook 'efs/org-babel-tangle-config)))
-
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook 'config/org-babel-tangle-config)))
+  
 #+end_src
 
 #+RESULTS:
@@ -530,16 +611,15 @@
 #+end_src
 
 #+RESULTS:
-: t
 *** C++
 #+begin_src emacs-lisp
   
-  (use-package eglot
-    :ensure t
-    :config
-    (add-to-list 'eglot-server-programs '((c++-mode c-mode) "ccls"))
-    (add-hook 'c-mode-hook 'eglot-ensure)
-    (add-hook 'c++-mode-hook 'eglot-ensure))
+ ;; (use-package eglot
+ ;;  :ensure t
+ ;;   :config
+ ;;   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "ccls"))
+ ;;   (add-hook 'c-mode-hook 'eglot-ensure)
+ ;;   (add-hook 'c++-mode-hook 'eglot-ensure))
   
 #+end_src
 
@@ -605,6 +685,9 @@
 
 #+end_src
 
+#+RESULTS:
+: vterm
+
 ** Python
 #+begin_src emacs-lisp
   
@@ -636,18 +719,60 @@
 
 #+end_src
 
+#+RESULTS:
 
-* Application
+** PDF Tools
+#+begin_src emacs-lisp
 
-
-** Some App
-
-#+begin_src conf-unix :tangle .config/some-app/config :mkdirp yes
-  value = 42 
+ (pdf-loader-install) 
+    
 #+end_src
 
 
-* Noweb Blocks
+* Email
+
+#+begin_src emacs-lisp
+  
+  (defun load-if-exists (f)
+    "Load a elisp file only if it exists and is readable"
+    (if (file-readable-p f)
+        (load-file f)))
+
+  (load-if-exists "~/.emacs.d/mu4econfig.el")
+  (global-set-key (kbd "<f4>") 'mu4e)
+
+  ;; Get alert of new emails
+  (use-package mu4e-alert
+    :ensure t
+    :after mu4e
+    :init
+    (mu4e-alert-enable-mode-line-display)
+    (defun gjstein-refresh-mu4e-alert-mode-line ()
+      (interactive)
+      (mu4e~proc-kill)
+      (mu4e-alert-enable-mode-line-display))
+    (run-with-timer 0 60 'gjstein-refresh-mu4e-alert-mode-line)
+    )
+
+#+end_src
+
+
+* Reddit
+#+begin_src emacs-lisp
+  
+    (use-package md4rd :ensure t
+    :config
+    (add-hook 'md4rd-mode-hook 'md4rd-indent-all-the-lines)
+    (setq md4rd-subs-active '(emacs lisp+Common_Lisp prolog clojure))
+    (setq md4rd--oauth-access-token
+          "766663629693-cU86xnU6n1cpmZCjN5Y5Y6v-N-HmKQ")
+    (setq md4rd--oauth-refresh-token
+          "766663629693-mBiu2VzFoZaQS79AJMvxtG8_Wrw13w")
+    (run-with-timer 0 3540 'md4rd-refresh-login))
+#+end_src
+
+
+* Noweb Blocbks
 
 Enables you to pass variables ito a source block!
 
