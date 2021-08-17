@@ -4,4 +4,12 @@
   [2021-05-02 Sun 12:43]
   [[file:~/.emacs.d/myinit.org::*whick key][whick key]]
 
+** TODO Check how Org reminder work
+  [2021-05-30 Sun 12:08]
+  [[file:~/.emacs.d/Emacs.org::*Org Allert][Org Allert]]
+
+** TODO Try again
+  [2021-05-30 Sun 12:08]
+  [[file:~/.emacs.d/Emacs.org::*Org Allert][Org Allert]]
+
 * 

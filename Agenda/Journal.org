@@ -13,3 +13,4 @@ CLOCK: [2021-05-02 Sun 12:44]--[2021-05-02 Sun 12:44] =>  0:00
 
 This is my first Journal entry
 
+*** 2021-05-30 Sunday
