@@ -1,0 +1,367 @@
+#+title: Emacs Desktop Environment
+#+PROPERTY: header-args:emacs-lisp :tangle ./desktop.el
+
+* Window Management
+
+** EXWM Configuration
+
+#+begin_src emacs-lisp 
+  
+      (defun d13353/run-in-background (command)
+        (let ((command-parts (split-string command "[ ]+")))
+          (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+  
+      (defun d13353/set-wallpaper ()
+        (interactive)
+        (start-process-shell-command
+         "feh" nil "feh --bg-scale /usr/share/backgrounds/gnome/Motivation.jpg"))
+  
+      (defun d13353/exwm-init-hook ()
+        ;; Make workspace 1 be the one where we land at startup
+        (exwm-workspace-switch-create 1)
+  
+        ;; Show the time adn date in the modeline
+        (setq display-time-day-and-date t)
+        (display-time-mode 1)
+        (setq display-time-format "%d/%m/%y - %H:%M") 
+  
+        (d13353/start-panel)
+        ;; Open Vterm by default
+        ;;(vterm) 
+        (d13353/run-in-background "nm-applet")
+        (d13353/run-in-background "pasystray")
+        (d13353/run-in-background "blueman-applet"))
+  
+  
+      (defun d13353/exwm-update-class ()
+        (exwm-workspace-rename-buffer exwm-class-name))
+  
+    (defun d13353/exwm-update-title ()
+      (pcase exwm-class-name
+        ("Brave-browser" (exwm-workspace-rename-buffer (format "Brave: %s" exwm-title)))))
+  
+  (defun d13353/configure-window-by-class ()
+    (interactive)
+    (pcase exwm-class-name
+      ("Brave-browser" (exwm-workspace-move-window 3))
+      ("vlc" (exwm-workspace-move-window 2))
+      ("LBRY" (exwm-workspace-move-window 2))))
+  
+  (defun d13353/update-displays ()
+        (d13353/run-in-background "autorandr --change --force")
+        (d13353/set-wallpaper)
+        (message "Display config: %s"
+                 (string-trim (shell-command-to-string "autorandr --current"))))
+  
+      (use-package exwm
+        :config
+        ;; Set the default number of workspaces
+        (setq exwm-workspace-number 5)
+  
+        ;; When window "class" updates, use it to set the buffer name
+        (add-hook 'exwm-update-class-hook #'d13353/exwm-update-class)
+  
+        ;; When window title updates, use it to set the buffer name
+         (add-hook 'exwm-update-title-hook #'d13353/exwm-update-title)
+  
+         ;; Configure windows as they are created
+         (add-hook 'exwm-manage-finish-hook #'d13353/configure-window-by-class)
+  
+           ;; When EXWM starts up, do some extra configuration
+        (add-hook 'exwm-init-hook #'d13353/exwm-init-hook)
+  
+        ;; Rebind CapsLock to Ctrl
+        (start-process-shell-command "xmodmap" nil "xmodmap ~/.emacs.d/exwm/Xmodmap")
+  
+        ;; Detech the minibuffer (show it with exwm-workspace-toggle-minibuffer)
+        (setq exwm-workspace-minibuffer-position 'bottom)
+  
+        ;; Set the screen resolution
+        (require 'exwm-randr)
+        (exwm-randr-enable)
+        ;;(start-process-shell-command "xrandr" nil "xrandr --output HDMI-1 --primary --mode 1920x1080 --pos 1920x0 --rotate normal --output DVI-I-1 --mode 1920x1080 --pos 0x0 --rotate normal")
+  
+        (setq exwm-randr-workspace-monitor-plist '(2 "DVI-I-1" 4 "DVI-I-1" 6 "DVI-I-1" 8 "DVI-I-1") )
+  
+        ;; React to display connectivity changes, do initial display update
+        (add-hook 'exwm-randr-screen-change-hook
+                  #'d13353/update-displays)
+        (d13353/update-displays)
+  
+         ;; Set the walpaper
+        (d13353/set-wallpaper)
+  
+        ;; Load the system tray before exwm-init
+        ;;(require 'exwm-systemtray)
+         ;;(setq exwm-systemtray-height 32)
+         ;;(exwm-systemtray-enable)
+  
+         ;; Cursor warpin
+         (setq exwm-workspace-warp-cursor t)
+  
+         (setq mouse-autoselect-window t
+               focus-follows-mouse t)
+  
+        ;; These keys should always pass through to Emacs
+        (setq exwm-input-prefix-keys
+          '(?\C-x
+            ?\C-u
+            ?\C-h
+            ?\M-x
+            ?\M-`
+            ?\M-&
+            ?\M-:
+            ?\C-\M-j  ;; Buffer list
+            ?\C-\ ))  ;; Ctrl+Space
+  
+        ;; Ctrl+Q will enable the next key to be sent directly
+        (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+  
+        ;; Set up global key bindings.  These always work, no matter the input state!
+        ;; Keep in mind that changing this list after EXWM initializes has no effect.
+        (setq exwm-input-global-keys
+              `(
+                ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
+                ([?\s-r] . exwm-reset)
+  
+                ;; Move between windows
+                ([s-left] . windmove-left)
+                ([s-right] . windmove-right)
+                ([s-up] . windmove-up)
+                ([s-down] . windmove-down)
+  
+                ;; Launch applications via shell command
+                ([?\s-&] . (lambda (command)
+                             (interactive (list (read-shell-command "$ ")))
+                             (start-process-shell-command command nil command)))
+  
+                ;; Switch workspace
+                ([?\s-w] . exwm-workspace-switch)
+                ([?\s-`] . (lambda () (interactive)
+                             (exwm-workspace-switch-create 0)))
+  
+                ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+                ,@(mapcar (lambda (i)
+                            `(,(kbd (format "s-%d" i)) .
+                              (lambda ()
+                                (interactive)
+                                (exwm-workspace-switch-create ,i))))
+                          (number-sequence 0 9))))
+  
+        (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
+  
+        (exwm-enable))
+  
+       (use-package desktop-environment
+         :after exwm
+         :config (desktop-environment-mode)
+         :custom
+         (desktop-environment-brightness-small-increment "2%+")
+         (desktop-environment-brightness-small-decrement "2%-")
+         (desktop-environment-brightness-normal-increment "5%+")
+         (desktop-environment-brightness-normal-decrement "5%-"))
+  
+#+end_src
+
+#+RESULTS:
+: t
+
+
+* Desktop Environment
+
+** Desktop file
+#+begin_src shell :tangle ./exwm/EXWM.desktop :mkdirp yes
+  
+  [Desktop Entry]
+  Name=EXWM
+  Comment=Emacs Window Manager
+  Exec=sh /home/k13353/.emacs.d/exwm/start-exwm.sh
+  TryExec=sh
+  Type=Application
+  X-LightDM-DesktopName=exwm
+  DesktopNames=exwm
+  
+#+end_src
+
+
+** Launcher Scripts
+
+#+begin_src shell :tangle ./exwm/start-exwm.sh :shebang #!/bin/sh
+  
+  # Run the screen compositor
+  picom &
+  
+  # Enalbe screen locking on suspend
+  xss-lock -- slock & 
+  
+  exec dbus-launch --exit-with-session emacs --debug-init -l ~/.emacs.d/desktop.el
+  
+#+end_src
+
+
+** Keyboard Configuration
+
+#+begin_src sh :tangle ./exwm/Xmodmap
+  
+  clear lock
+  clear control
+  keycode 66 = Control_L
+  add control = Control_L
+  add Lock = Control_R
+  
+#+end_src
+
+
+** Panel with PolyBar
+
+#+begin_src emacs-lisp
+  
+  ;; Make sure the server is started
+  (server-start)
+  
+  (defvar d13353/polybar-process nil
+    "Holds the process of the running Polybar instance, if any")
+  
+  (defun d13353/kill-panel ()
+    (interactive)
+    (when d13353/polybar-process
+      (ignore-errors
+          (kill-process d13353/polybar-process)))
+    (setq d13353/polybar-process nil))
+  
+  (defun d13353/start-panel ()
+    (interactive)
+    (d13353/kill-panel)
+    (setq d13353/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
+  
+  (defun d13353/send-polybar-hook (module-name hook-index)
+    (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
+  
+  (defun d13353/send-polybar-exwm-workspace ()
+    (d13353/send-polybar-hook "exwm-workspace" 1))
+  
+  ;; Update panel indicator when workspace changes
+  (add-hook 'exwm-workspace-switch-hook #'d13353/send-polybar-exwm-workspace)
+  
+#+end_src
+
+#+RESULTS:
+: d13353/start-panel
+
+#+begin_src conf :tangle ~/.config/polybar/config :mkdirp yes
+
+; Docs: https://github.com/polybar/polybar
+;==========================================================
+
+[settings]
+screenchange-reload = true
+
+[global/wm]
+margin-top = 0
+margin-bottom = 0
+
+[colors]
+background = #f0232635
+background-alt = #576075
+foreground = #A6Accd
+foreground-alt = #555
+primary = #ffb52a
+secondary = #e60053
+alert = #bd2c40
+underline-1 = #c792ea
+
+[bar/panel]
+width = 100%
+height = 35
+offset-x = 0
+offset-y = 0
+fixed-center = true
+enable-ipc = true
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+line-size = 2
+line-color = #f00
+
+border-size = 0
+border-color = #00000000
+
+padding-top = 5
+padding-left = 1
+padding-right = 1
+
+module-margin = 1
+
+font-0 = "Cantarell:size=18:weight=bold;2"
+font-1 = "Font Awesome:size=14;2"
+font-2 = "Material Icons:size=20;5"
+font-3 = "Fira Mono:size=13;-3"
+
+modules-left = exwm-workspace
+modules-right = cpu temperature date
+
+tray-position = right
+tray-padding = 2
+tray-maxsize = 28
+
+cursor-click = pointer
+cursor-scroll = ns-resize
+
+[module/exwm-workspace]
+type = custom/ipc
+hook-0 = emacsclient -e "exwm-workspace-current-index" | sed -e 's/^"//' -e 's/"$//'
+initial = 1
+format-underline = ${colors.underline-1}
+format-padding = 1
+
+[module/cpu]
+type = internal/cpu
+interval = 2
+format = <label> <ramp-coreload>
+format-underline = ${colors.underline-1}
+click-left = emacsclient -e "(proced)"
+label = %percentage:2%%
+ramp-coreload-spacing = 0
+ramp-coreload-0 = ▁
+ramp-coreload-0-foreground = ${colors.foreground-alt}
+ramp-coreload-1 = ▂
+ramp-coreload-2 = ▃
+ramp-coreload-3 = ▄
+ramp-coreload-4 = ▅
+ramp-coreload-5 = ▆
+ramp-coreload-6 = ▇
+
+[module/date]
+type = internal/date
+interval = 5
+
+date = "%a %b %e"
+date-alt = "%A %B %d %Y"
+
+time = %l:%M %p
+time-alt = %H:%M:%S
+
+format-prefix-foreground = ${colors.foreground-alt}
+format-underline = ${colors.underline-1}
+
+label = %date% %time%
+
+[module/temperature]
+type = internal/temperature
+thermal-zone = 0
+warn-temperature = 60
+
+format = <label>
+format-underline = ${colors.underline-1}
+format-warn = <label-warn>
+format-warn-underline = ${self.format-underline}
+
+label = %temperature-c%
+label-warn = %temperature-c%!
+label-warn-foreground = ${colors.secondary}
+
+#+end_src
+
+
+** Requesting information from Emacs

@@ -42,49 +42,58 @@
 
 #+begin_src emacs-lisp
   
-  (toggle-frame-maximized)
-  (setq inhibit-startup-message t)
+    (toggle-frame-maximized)
+    (setq inhibit-startup-message t)
   
-  (scroll-bar-mode -1)     ; Disable visible scrollbar
-  (tool-bar-mode -1)       ; Disabel the toolbar
-  (tooltip-mode -1)        ; Disabel tooltips
-  (set-fringe-mode 10)     ; Give some breathing room
+    (scroll-bar-mode -1)     ; Disable visible scrollbar
+    (tool-bar-mode -1)       ; Disabel the toolbar
+    (tooltip-mode -1)        ; Disabel tooltips
+    (set-fringe-mode 10)     ; Give some breathing room
   
-  (menu-bar-mode -1)    ; Disable the menu bar
-  (fset 'yes-or-no-p 'y-or-n-p)
+    (menu-bar-mode -1)    ; Disable the menu bar
+    (fset 'yes-or-no-p 'y-or-n-p)
   
-  ;; Set up the visible bell
-  (setq visible-bell t)
+    ;; Set up the visible bell
+    (setq visible-bell t)
   
-  (column-number-mode)
-  (global-display-line-numbers-mode t)
+    (column-number-mode)
+    (global-display-line-numbers-mode t)
   
-  ;; Disable line numbers for some modes
-  (dolist (mode '(org-mode-hook
-                  term-mode-hook
-                  shell-mode-hook
-                  eshell-mode-hook
-                  vterm-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+   ;; Use ivy-posframe
+  ;;(use-package ivy-posframe)
   
-  ;; Set the directory for backup files
-  (setq backup-directory-alist
-        '(("." . "~/.emacs.d/file-backups")))
+  ;; Set frame transparency
+  (set-frame-parameter (selected-frame) 'alpha'(95 . 70))
+  (add-to-list 'default-frame-alist '(alpha . (95 . 70)))
+  (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
   
-  ;; Highlight line mode
-  (global-hl-line-mode t)
-
-  ;; Beacon mode
-  (use-package beacon
-    :ensure t
-    :config
-    (beacon-mode 1))
-
-  ;; Expand region
-  (use-package expand-region
-    :ensure t
-    :config
-    (global-set-key (kbd "C-=") 'er/expand-region))
+    ;; Disable line numbers for some modes
+    (dolist (mode '(org-mode-hook
+                    term-mode-hook
+                    shell-mode-hook
+                    eshell-mode-hook
+                    vterm-mode-hook))
+      (add-hook mode (lambda () (display-line-numbers-mode 0))))
+  
+    ;; Set the directory for backup files
+    (setq backup-directory-alist
+          '(("." . "~/.emacs.d/file-backups")))
+  
+    ;; Highlight line mode
+  ;;  (global-hl-line-mode t)
+  
+    ;; Beacon mode
+    (use-package beacon
+      :ensure t
+      :config
+      (beacon-mode 1))
+  
+    ;; Expand region
+    (use-package expand-region
+      :ensure t
+      :config
+      (global-set-key (kbd "C-=") 'er/expand-region))
   
 #+end_src
 
@@ -125,10 +134,13 @@
 ** Color Theme
 
 #+begin_src emacs-lisp
-
-  (use-package doom-themes
-    :init (load-theme 'doom-dracula t))
-
+  
+    (use-package doom-themes
+      :init (load-theme 'doom-dracula t))
+  
+  ;;(use-package autothemer
+  ;;  :ensure t)
+  
 #+end_src
 
 #+RESULTS:
@@ -174,13 +186,17 @@
 ** Ivy - Counsel - Swiper
 
 #+begin_src emacs-lisp
-
+  
   ;; We need to to have counsil in order to for swiper to work
   (use-package counsel
     :ensure t
     :bind (:map minibuffer-local-map
-                ("C-r" . 'counsel-minibuffer-history)))
-
+                ("C-r" . 'counsel-minibuffer-history))
+    :custom
+    (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+    :config
+    (counsel-mode 1))
+  
   (use-package swiper
     :ensure try
     :config
@@ -203,12 +219,12 @@
       (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
       (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
       ))
-
+  
   ;; Ivy Rich
   (use-package ivy-rich
     :init
     (ivy-rich-mode 1))
-
+  
 #+end_src
 
 #+RESULTS:
@@ -317,6 +333,26 @@
 : t
 
 
+* File Management
+
+** Dired
+#+begin_src emacs-lisp
+  
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :bind (("C-x C-j" . dired-jump))
+    :custom ((dired-listing-switches "-agho --group-directories-first"))
+    :config
+    (define-key dired-mode-map (kbd "h") 'dired-up-directory)
+    (define-key dired-mode-map (kbd "l") 'dired-find-file))
+  
+#+end_src
+
+#+RESULTS:
+: dired-jump
+
+
 * Org Mode
 
 
@@ -420,7 +456,7 @@
 
   (setq org-capture-templates
     `(("t" "Tasks / Projects")
-      ("tt" "Task" entry (file+olp "~/.emacs.d/Agenda/tasks.org" "Inbox")
+      ("tt" "Inbox" entry (file+olp "~/.emacs.d/Agenda/inbox.org" "Inbox")
        "* TODO %?\nSCHEDULED: %t\n  %a" :empty-lines 1)
 
       ("tm" "Meeting" entry (file+olp "~/.emacs.d/Agenda/tasks.org" "Meetings")
@@ -530,7 +566,7 @@
   (push '("conf-unix" . conf-unix) org-src-lang-modes)
 
   ;; Structure Templates
-;;  (require 'org-tempo)
+  (require 'org-tempo)
 
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
@@ -539,37 +575,15 @@
 #+end_src
 
 #+RESULTS:
-#+begin_example
-((py . src python) (el . src emacs-lisp) (sh . src shell) (s #+BEGIN_SRC ?
-
-,#+END_SRC) (e #+BEGIN_EXAMPLE
-?
-,#+END_EXAMPLE) (q #+BEGIN_QUOTE
-?
-,#+END_QUOTE) (v #+BEGIN_VERSE
-?
-,#+END_VERSE) (V #+BEGIN_VERBATIM
-?
-,#+END_VERBATIM) (c #+BEGIN_CENTER
-?
-,#+END_CENTER) (C #+BEGIN_COMMENT
-?
-,#+END_COMMENT) (l #+BEGIN_EXPORT latex
-?
-,#+END_EXPORT) (L #+LaTeX: ) (h #+BEGIN_EXPORT html
-?
-,#+END_EXPORT) (H #+HTML: ) (a #+BEGIN_EXPORT ascii
-?
-,#+END_EXPORT) (A #+ASCII: ) (i #+INDEX: ?) (I #+INCLUDE: %file ?))
-#+end_example
+: ((py . src python) (el . src emacs-lisp) (sh . src shell) (a . export ascii) (c . center) (C . comment) (e . example) (E . export) (h . export html) (l . export latex) (q . quote) (s . src) (v . verse))
 
 ** Auto-tangle Configuration Files
 
 #+begin_src emacs-lisp
   ;; Automatically tangle our Emacs.org config file when save it
   (defun config/org-babel-tangle-config ()
-    (when (string-equal (buffer-file-name)
-                        (expand-file-name "~/.emacs.d/Emacs.org"))
+    (when (string-equal (file-name-directory (buffer-file-name))
+                        (expand-file-name "~/.emacs.d/"))
       ;; Dynamic scoping to the rescue
       (let ((org-confirm-babel-evaluate nil))
         (org-babel-tangle))))
@@ -579,6 +593,7 @@
 #+end_src
 
 #+RESULTS:
+| #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | (lambda nil (add-hook 'after-save-hook 'config/org-babel-tangle-config)) | org-tempo-setup | config/org-mode-visual-fill | org-bullets-mode | er/add-org-mode-expansions | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | config/org-mode-setup | (lambda nil (display-line-numbers-mode 0)) | org-eldoc-load |
 
 
 * Development
@@ -676,6 +691,20 @@
 | rainbow-delimiters-mode |
 
 ** Terminal
+*** term-mode
+#+begin_src emacs-lisp
+  
+  (use-package term
+    :config
+    (setq explicit-shell-file-name "/bin/zsh")
+    (setq term-prompt-regexp "^[#$%\n]*[#$%>] *"))
+  
+#+end_src
+
+#+RESULTS:
+: t
+
+*** Vterm
 #+begin_src emacs-lisp
 
   ;; Use vterm
@@ -760,41 +789,20 @@
 * Reddit
 #+begin_src emacs-lisp
   
-    (use-package md4rd :ensure t
-    :config
-    (add-hook 'md4rd-mode-hook 'md4rd-indent-all-the-lines)
-    (setq md4rd-subs-active '(emacs lisp+Common_Lisp prolog clojure))
-    (setq md4rd--oauth-access-token
-          "766663629693-cU86xnU6n1cpmZCjN5Y5Y6v-N-HmKQ")
-    (setq md4rd--oauth-refresh-token
-          "766663629693-mBiu2VzFoZaQS79AJMvxtG8_Wrw13w")
-    (run-with-timer 0 3540 'md4rd-refresh-login))
+  ;; (use-package md4rd :ensure t
+  ;; :config
+  ;; (add-hook 'md4rd-mode-hook 'md4rd-indent-all-the-lines)
+  ;; (setq md4rd-subs-active '(emacs lisp+Common_Lisp prolog clojure))
+  ;; (setq md4rd--oauth-access-token
+  ;;       "766663629693-cU86xnU6n1cpmZCjN5Y5Y6v-N-HmKQ")
+  ;; (setq md4rd--oauth-refresh-token
+  ;;       "766663629693-mBiu2VzFoZaQS79AJMvxtG8_Wrw13w")
+  ;; (run-with-timer 0 3540 'md4rd-refresh-login))
 #+end_src
 
 
-* Noweb Blocbks
 
-Enables you to pass variables ito a source block!
 
-#+NAME: the-value
-#+begin_src emacs-lisp
-55
-#+end_src
-
-#+RESULTS: the-value
-: 55
-
-#+NAME: the-second-value
-#+begin_src emacs-lisp
-(+ 55 39)
-#+end_src
-
-#+begin_src conf-unix :tangle .config/some-app/config :noweb yes
-
-  value2 = <<the-value>>
-  value3 = <<the-second-value()>>
-
-#+end_src
 
 
 
